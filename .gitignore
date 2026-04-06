@@ -1,0 +1,48 @@
+# ============================================================
+# NewsMind — .gitignore
+# ============================================================
+
+# ----- Biến môi trường / API keys --------------------------
+.env
+.env.*
+!.env.example
+
+# ----- Model weights (quá lớn cho GitHub, ~516 MB) ----------
+model/bertpho/model.pt
+
+# ----- Word Embedding artifacts (>30 MB mỗi file) -----------
+embedding/glove/glove_model_state.pt
+embedding/glove/embedding_glove_content.pt
+embedding/glove/word2idx_glove_content.pt
+embedding/glove/idx2word_glove_content.pt
+embedding/skip-gram/word2vec_content.model
+embedding/skip-gram/embedding_content.pt
+embedding/skip-gram/word2idx_content.pt
+
+# ----- Dataset CSV (20–40 MB mỗi file) ----------------------
+data/
+
+# ----- Python cache ----------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ----- Virtual environments --------------------------------
+venv/
+.venv/
+env/
+.env.local
+
+# ----- IDE / OS -------------------------------------------
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# ----- Jupyter checkpoints --------------------------------
+.ipynb_checkpoints/
+
+# ----- Báo cáo (tùy chọn, có thể bỏ dòng này nếu muốn đẩy)
+# Báo cáo.pptx

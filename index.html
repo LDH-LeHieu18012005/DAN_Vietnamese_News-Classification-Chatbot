@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NewsMind · Phân loại tin tức</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #f0f6ff;
+      --bg2: #e8f0fe;
+      --surface: #ffffff;
+      --surface2: #f5f8ff;
+      --border: #d0deff;
+      --border-strong: #a8c0f0;
+      --text: #0f1d3a;
+      --text-sub: #4a6080;
+      --hint: #94afc8;
+      --accent: #1a6ef5;
+      --accent-2: #0f4fd4;
+      --accent-light: #deeaff;
+      --accent-glow: rgba(26, 110, 245, .18);
+      --cat-tech-bg: #e8f0fe;
+      --cat-tech: #1a56db;
+      --cat-biz-bg: #ecfdf5;
+      --cat-biz: #047857;
+      --cat-world-bg: #f5f3ff;
+      --cat-world: #6d28d9;
+      --cat-sport-bg: #fff7ed;
+      --cat-sport: #c2410c;
+      --user-bubble: #e8f0fe;
+      --ai-bubble: #f5f8ff;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --r: 14px;
+      --rsm: 8px
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 2px
+    }
+
+    .header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #00a8ff);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px var(--accent-glow)
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.3px
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 1px
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .model-tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text-sub);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 12px;
+      color: var(--text-sub);
+      transition: border-color .3s, color .3s
+    }
+
+    .status-badge.online {
+      border-color: #86efac;
+      color: #15803d
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--hint);
+      transition: background .3s
+    }
+
+    .dot.on {
+      background: #22c55e;
+      box-shadow: 0 0 6px rgba(34, 197, 94, .5)
+    }
+
+    .app-body {
+      width: 100%;
+      max-width: 1100px;
+      height: calc(100vh - 108px);
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 4px 24px rgba(26, 110, 245, .08), 0 1px 3px rgba(0, 0, 0, .06)
+    }
+
+    .pane-head {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      flex-shrink: 0
+    }
+
+    .pane-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .count-tag {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--hint);
+      font-family: var(--mono)
+    }
+
+    .pane-left {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden
+    }
+
+    .editor-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      min-height: 0
+    }
+
+    #highlight-layer {
+      position: absolute;
+      inset: 0;
+      padding: 18px 20px;
+      font-size: 13.5px;
+      font-family: var(--font);
+      line-height: 1.75;
+      color: transparent;
+      white-space: pre-wrap;
+      word-break: break-word;
+      pointer-events: none;
+      overflow: hidden;
+      background: transparent
+    }
+
+    mark.hl {
+      border-radius: 3px;
+      padding: 0 2px;
+      color: transparent
+    }
+
+    mark.hl-cong-nghe {
+      background: rgba(26, 86, 219, .14)
+    }
+
+    mark.hl-kinh-doanh {
+      background: rgba(4, 120, 87, .12)
+    }
+
+    mark.hl-the-gioi {
+      background: rgba(109, 40, 217, .12)
+    }
+
+    mark.hl-the-thao {
+      background: rgba(194, 65, 12, .12)
+    }
+
+    textarea#articleText {
+      position: absolute;
+      inset: 0;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 18px 20px;
+      font-size: 13.5px;
+      font-family: var(--font);
+      line-height: 1.75;
+      color: var(--text);
+      background: transparent;
+      caret-color: var(--accent);
+      z-index: 1
+    }
+
+    textarea#articleText::placeholder {
+      color: var(--hint)
+    }
+
+    .actions-bar {
+      padding: 11px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      flex-shrink: 0
+    }
+
+    .btn {
+      padding: 7px 16px;
+      border-radius: var(--rsm);
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font);
+      white-space: nowrap
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--bg2);
+      color: var(--text);
+      border-color: var(--accent)
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 2px 10px var(--accent-glow)
+    }
+
+    .btn.primary:hover:not(:disabled) {
+      background: var(--accent-2)
+    }
+
+    .btn.primary:disabled {
+      background: var(--border);
+      border-color: transparent;
+      color: var(--hint);
+      box-shadow: none
+    }
+
+    .word-count {
+      font-size: 11px;
+      color: var(--hint);
+      margin-left: auto;
+      font-family: var(--mono)
+    }
+
+    .result-panel {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+      animation: slideUp .22s ease
+    }
+
+    .result-panel.show {
+      display: flex
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .cat-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .cat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 13px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1.5px solid transparent
+    }
+
+    .cat-badge.cong-nghe {
+      background: var(--cat-tech-bg);
+      color: var(--cat-tech);
+      border-color: rgba(26, 86, 219, .25)
+    }
+
+    .cat-badge.kinh-doanh {
+      background: var(--cat-biz-bg);
+      color: var(--cat-biz);
+      border-color: rgba(4, 120, 87, .2)
+    }
+
+    .cat-badge.the-gioi {
+      background: var(--cat-world-bg);
+      color: var(--cat-world);
+      border-color: rgba(109, 40, 217, .2)
+    }
+
+    .cat-badge.the-thao {
+      background: var(--cat-sport-bg);
+      color: var(--cat-sport);
+      border-color: rgba(194, 65, 12, .2)
+    }
+
+    .tier-badge {
+      font-size: 10px;
+      font-weight: 700;
+      font-family: var(--mono);
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: .5px
+    }
+
+    .tier-HIGH {
+      background: #dcfce7;
+      color: #15803d
+    }
+
+    .tier-MED {
+      background: #fef9c3;
+      color: #a16207
+    }
+
+    .tier-LOW {
+      background: #fee2e2;
+      color: #b91c1c
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 18px
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .stat-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: var(--mono)
+    }
+
+    .conf-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .conf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .conf-label {
+      font-size: 11px;
+      color: var(--text-sub)
+    }
+
+    .conf-pct {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: var(--mono)
+    }
+
+    .conf-bar {
+      height: 5px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden
+    }
+
+    .conf-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), #00a8ff);
+      width: 0%;
+      transition: width .6s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .prob-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .prob-bar-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 40px;
+      align-items: center;
+      gap: 8px
+    }
+
+    .prob-bar-label {
+      font-size: 11px;
+      color: var(--text-sub)
+    }
+
+    .prob-bar-track {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      overflow: hidden
+    }
+
+    .prob-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width .65s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .prob-bar-fill.cong-nghe {
+      background: var(--cat-tech)
+    }
+
+    .prob-bar-fill.kinh-doanh {
+      background: var(--cat-biz)
+    }
+
+    .prob-bar-fill.the-gioi {
+      background: var(--cat-world)
+    }
+
+    .prob-bar-fill.the-thao {
+      background: var(--cat-sport)
+    }
+
+    .prob-bar-pct {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text-sub);
+      text-align: right
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .action-chip {
+      padding: 4px 11px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 11.5px;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font)
+    }
+
+    .action-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light)
+    }
+
+    .hl-legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--hint);
+      align-items: center
+    }
+
+    .hl-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .hl-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px
+    }
+
+    .pane-right {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .chat-head {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      flex-shrink: 0
+    }
+
+    .chat-head-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px
+    }
+
+    .chat-model-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .chat-model-sub {
+      font-size: 11px;
+      color: var(--accent);
+      font-family: var(--mono)
+    }
+
+    .head-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 6px
+    }
+
+    .icon-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: 11px;
+      color: var(--hint);
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font)
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light)
+    }
+
+    .chat-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      text-align: center;
+      padding: 24px
+    }
+
+    .empty-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: var(--accent-light);
+      border: 1.5px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .empty-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.6;
+      max-width: 240px
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 4px
+    }
+
+    .chip {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-sub);
+      cursor: pointer;
+      background: var(--surface);
+      transition: all .15s;
+      font-family: var(--font)
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light)
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-width: 90%;
+      animation: msgIn .18s ease
+    }
+
+    @keyframes msgIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      align-items: flex-end
+    }
+
+    .msg.ai {
+      align-self: flex-start
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--hint)
+    }
+
+    .msg-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px
+    }
+
+    .msg.ai .msg-avatar {
+      background: var(--accent-light)
+    }
+
+    .msg.user .msg-avatar {
+      background: var(--bg2)
+    }
+
+    .bubble {
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      border: 1px solid var(--border);
+      word-break: break-word
+    }
+
+    .msg.user .bubble {
+      background: var(--user-bubble);
+      border-color: var(--border-strong);
+      border-bottom-right-radius: 4px
+    }
+
+    .msg.ai .bubble {
+      background: var(--ai-bubble);
+      border-bottom-left-radius: 4px
+    }
+
+    .bubble strong {
+      font-weight: 600
+    }
+
+    .bubble code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg2);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--accent)
+    }
+
+    .bubble ul,
+    .bubble ol {
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .bubble li {
+      font-size: 13px
+    }
+
+    .typing-bubble {
+      background: var(--ai-bubble);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      border-bottom-left-radius: 4px;
+      padding: 11px 15px;
+      display: flex;
+      gap: 5px;
+      align-items: center
+    }
+
+    .typing-bubble span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--hint);
+      animation: blink 1.3s infinite ease-in-out
+    }
+
+    .typing-bubble span:nth-child(2) {
+      animation-delay: .2s
+    }
+
+    .typing-bubble span:nth-child(3) {
+      animation-delay: .4s
+    }
+
+    @keyframes blink {
+
+      0%,
+      80%,
+      100% {
+        opacity: .2;
+        transform: scale(.9)
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1.1)
+      }
+    }
+
+    .chat-foot {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      background: var(--surface2);
+      flex-shrink: 0
+    }
+
+    textarea#chatInput {
+      flex: 1;
+      padding: 8px 13px;
+      border-radius: var(--rsm);
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      font-family: var(--font);
+      resize: none;
+      min-height: 38px;
+      max-height: 100px;
+      line-height: 1.5;
+      transition: border-color .15s, box-shadow .15s
+    }
+
+    textarea#chatInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow)
+    }
+
+    textarea#chatInput::placeholder {
+      color: var(--hint)
+    }
+
+    .send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--rsm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .15s;
+      box-shadow: 0 2px 10px var(--accent-glow)
+    }
+
+    .send-btn:hover {
+      background: var(--accent-2)
+    }
+
+    .send-btn:disabled {
+      background: var(--border);
+      box-shadow: none;
+      cursor: not-allowed
+    }
+
+    .send-btn svg {
+      width: 16px;
+      height: 16px
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 29, 58, .4);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 26px;
+      width: 580px;
+      max-width: 94vw;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 60px rgba(26, 110, 245, .12);
+      max-height: 90vh;
+      overflow-y: auto
+    }
+
+    .modal h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .modal p {
+      font-size: 12.5px;
+      color: var(--text-sub);
+      line-height: 1.6
+    }
+
+    .modal textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--rsm);
+      font-size: 12.5px;
+      font-family: var(--mono);
+      color: var(--text);
+      background: var(--surface2);
+      outline: none;
+      resize: vertical
+    }
+
+    .modal textarea:focus {
+      border-color: var(--accent)
+    }
+
+    .modal-note {
+      font-size: 11px;
+      color: var(--hint)
+    }
+
+    .modal-foot {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .batch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px
+    }
+
+    .batch-table th {
+      text-align: left;
+      padding: 6px 10px;
+      font-weight: 600;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .batch-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top
+    }
+
+    .batch-table tr:hover td {
+      background: var(--surface2)
+    }
+
+    .batch-preview {
+      color: var(--text-sub);
+      font-size: 11px
+    }
+
+    @media(max-width:700px) {
+      .app-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+        height: auto
+      }
+
+      .pane-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border)
+      }
+
+      .model-tag {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo">📰</div>
+    <div>
+      <div class="header-title">NewsMind</div>
+      <div class="header-sub">Phân loại tin tức tiếng Việt · Syntax highlight · Batch export · AI chat</div>
+    </div>
+    <div class="header-right">
+      <span class="model-tag">vinai/phobert-base</span>
+      <div class="status-badge" id="statusBadge">
+        <div class="dot" id="apiDot"></div>
+        <span id="apiStatus">Đang kết nối...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-body">
+
+    <!-- LEFT PANE -->
+    <section class="pane-left">
+      <div class="pane-head">
+        <span class="pane-label">Bài báo</span>
+        <div class="hl-legend" id="hlLegend" style="display:none">
+          <span class="hl-dot"><span class="hl-swatch" style="background:rgba(26,86,219,.25)"></span>Công nghệ</span>
+          <span class="hl-dot"><span class="hl-swatch" style="background:rgba(4,120,87,.2)"></span>Kinh doanh</span>
+          <span class="hl-dot"><span class="hl-swatch" style="background:rgba(109,40,217,.2)"></span>Thế giới</span>
+          <span class="hl-dot"><span class="hl-swatch" style="background:rgba(194,65,12,.2)"></span>Thể thao</span>
+        </div>
+        <span class="count-tag" id="charCount">0 ký tự</span>
+      </div>
+
+      <div class="editor-wrap">
+        <div id="highlight-layer" aria-hidden="true"></div>
+        <textarea id="articleText"
+          placeholder="Dán nội dung bài báo vào đây...&#10;&#10;Ví dụ: Apple vừa ra mắt iPhone 17 với chip A19 mạnh mẽ..."
+          oninput="onInput(this)" spellcheck="false"></textarea>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn primary" id="classifyBtn" onclick="doClassify()">Phân loại</button>
+        <button class="btn" onclick="openBatch()">📦 Batch</button>
+        <button class="btn" onclick="clearAll()">Xoá</button>
+        <span class="word-count" id="wordCount">0 từ</span>
+      </div>
+
+      <div class="result-panel" id="resultPanel">
+        <div class="cat-row">
+          <span class="cat-badge" id="catBadge"></span>
+          <span class="tier-badge" id="tierBadge"></span>
+        </div>
+        <div class="stats-row" id="statsRow"></div>
+        <div class="conf-section">
+          <div class="conf-header">
+            <span class="conf-label">Độ tin cậy</span>
+            <span class="conf-pct" id="confPct">—</span>
+          </div>
+          <div class="conf-bar">
+            <div class="conf-fill" id="confFill"></div>
+          </div>
+        </div>
+        <div class="prob-bars" id="probBars"></div>
+        <div class="quick-actions" id="quickActions"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE -->
+    <section class="pane-right">
+      <div class="chat-head">
+        <div
+          style="width:28px;height:28px;border-radius:8px;background:var(--accent-light);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">
+          🤖</div>
+        <div class="chat-head-info">
+          <span class="chat-model-name">Trợ lý AI</span>
+          <span class="chat-model-sub">Llama-3.1-8B · Cerebras · Giải thích & trò chuyện</span>
+        </div>
+        <div class="head-actions">
+          <button class="icon-btn" onclick="openBatch()">📦 Batch export</button>
+          <button class="icon-btn" onclick="clearChat()">Xóa chat</button>
+        </div>
+      </div>
+
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">💬</div>
+          <div class="empty-title">Trò chuyện với AI</div>
+          <div class="empty-sub">Phân loại bài báo để bắt đầu, hoặc hỏi ngay bất cứ điều gì.</div>
+          <div class="chips" id="defaultChips">
+            <span class="chip" onclick="useChip(this)">Tóm tắt bài báo</span>
+            <span class="chip" onclick="useChip(this)">Tại sao phân loại vậy?</span>
+            <span class="chip" onclick="useChip(this)">Từ khóa chính là gì?</span>
+            <span class="chip" onclick="useChip(this)">Mô hình có chắc không?</span>
+            <span class="chip" onclick="useChip(this)">Bài viết có thiên vị không?</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-foot">
+        <textarea id="chatInput" placeholder="Hỏi về bài báo, yêu cầu tóm tắt, hoặc chat tự do..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- BATCH MODAL -->
+  <div class="modal-overlay" id="batchModal" style="display:none">
+    <div class="modal">
+      <h2>📦 Batch Classification &amp; Export</h2>
+      <p>Nhập nhiều bài báo, mỗi bài cách nhau bằng <strong>1 dòng trống</strong>. Kết quả có thể xuất CSV.</p>
+      <textarea id="batchInput" placeholder="Bài 1: Apple vừa ra mắt iPhone 17...
+
+Bài 2: Đội tuyển Việt Nam giành chiến thắng 2-0...
+
+Bài 3: GDP Việt Nam tăng trưởng 7.5% trong quý 3..."></textarea>
+      <div class="modal-note">Mỗi đoạn văn bản ngăn cách 1 dòng trống = 1 bài báo.</div>
+      <div class="modal-foot">
+        <button class="btn primary" onclick="runBatch()">Phân loại tất cả</button>
+        <button class="btn" id="exportBtn" onclick="exportCSV()" style="display:none">⬇ Xuất CSV</button>
+        <button class="btn" onclick="document.getElementById('batchModal').style.display='none'">Đóng</button>
+      </div>
+      <div id="batchResults"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:8000";
+
+    const LABEL_VI = { "cong-nghe": "Công nghệ", "kinh-doanh": "Kinh doanh", "the-gioi": "Thế giới", "the-thao": "Thể thao" };
+    const LABEL_EMOJI = { "cong-nghe": "💻", "kinh-doanh": "📈", "the-gioi": "🌍", "the-thao": "⚽" };
+
+    const KEYWORDS = {
+      "cong-nghe": ["AI", "trí tuệ nhân tạo", "công nghệ", "phần mềm", "phần cứng", "chip", "robot", "điện thoại", "máy tính", "Internet", "Apple", "Google", "Samsung", "Microsoft", "Meta", "GPU", "CPU", "dữ liệu", "blockchain", "cloud", "lập trình", "ứng dụng", "5G", "VR", "AR", "startup", "iPhone", "Android"],
+      "kinh-doanh": ["kinh doanh", "doanh nghiệp", "thị trường", "cổ phiếu", "GDP", "lạm phát", "đầu tư", "tài chính", "ngân hàng", "tiền tệ", "xuất khẩu", "nhập khẩu", "lợi nhuận", "doanh thu", "tăng trưởng", "kinh tế", "vốn", "IPO", "M&A", "thương mại", "chứng khoán"],
+      "the-gioi": ["thế giới", "quốc tế", "toàn cầu", "Mỹ", "Trung Quốc", "Nga", "châu Âu", "NATO", "Liên Hợp Quốc", "ngoại giao", "chiến tranh", "xung đột", "hòa bình", "hội nghị", "tổng thống", "thủ tướng", "chính phủ", "biển Đông", "địa chính trị"],
+      "the-thao": ["bóng đá", "bóng rổ", "tennis", "Olympic", "World Cup", "SEA Games", "vô địch", "HLV", "cầu thủ", "đội tuyển", "giải đấu", "thi đấu", "trận đấu", "bàn thắng", "kỷ lục", "huy chương", "VĐV", "bơi lội", "điền kinh"],
+    };
+
+    const CATEGORY_CHIPS = {
+      "cong-nghe": ["AI/ML được đề cập không?", "Tác động đến ngành tech?", "Công ty nào liên quan?", "Xu hướng công nghệ?"],
+      "kinh-doanh": ["Tác động đến thị trường?", "Ai được lợi từ tin này?", "Phân tích rủi ro?", "Triển vọng ngành?"],
+      "the-gioi": ["Bối cảnh địa chính trị?", "Các bên liên quan?", "Ảnh hưởng toàn cầu?", "So sánh lịch sử?"],
+      "the-thao": ["Đội/VĐV nào nổi bật?", "Thành tích ấn tượng?", "Giải đấu nào?", "Dự đoán tiếp theo?"],
+    };
+
+    let articleText = "", currentResult = null, chatHistory = [], debounceTimer = null, isSending = false, batchData = [];
+
+    (async function init() {
+      checkAPI();
+      setInterval(checkAPI, 10000);
+    })();
+
+    async function checkAPI() {
+      try {
+        const r = await fetch(API_URL + "/health", { signal: AbortSignal.timeout(3000) });
+        if (r.ok) { setAPIStatus(true); return; }
+      } catch (_) { }
+      setAPIStatus(false);
+    }
+
+    function setAPIStatus(on) {
+      document.getElementById("apiDot").classList.toggle("on", on);
+      document.getElementById("statusBadge").classList.toggle("online", on);
+      document.getElementById("apiStatus").textContent = on ? "API đang chạy" : "API chưa chạy";
+    }
+
+    function onInput(el) {
+      articleText = el.value;
+      const words = articleText.trim() ? articleText.trim().split(/\s+/).length : 0;
+      document.getElementById("charCount").textContent = articleText.length.toLocaleString("vi") + " ký tự";
+      document.getElementById("wordCount").textContent = words.toLocaleString("vi") + " từ";
+      updateHighlight(articleText, currentResult?.label || null);
+      clearTimeout(debounceTimer);
+      if (words > 20) debounceTimer = setTimeout(() => doClassify(true), 1800);
+    }
+
+    function escHtml(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+    function updateHighlight(text, label) {
+      const layer = document.getElementById("highlight-layer");
+      const legend = document.getElementById("hlLegend");
+      if (!label || !text) { layer.innerHTML = ""; legend.style.display = "none"; return; }
+      legend.style.display = "flex";
+      const kws = KEYWORDS[label] || [];
+      if (!kws.length) { layer.innerHTML = escHtml(text); return; }
+      const escaped = kws.map(k => escHtml(k).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
+      layer.innerHTML = escHtml(text).replace(pattern, `<mark class="hl hl-${label}">$1</mark>`);
+    }
+
+    async function doClassify(silent = false) {
+      if (!articleText.trim()) return;
+      const btn = document.getElementById("classifyBtn");
+      btn.disabled = true; btn.textContent = "Đang phân loại...";
+      try {
+        const r = await fetch(API_URL + "/classify_text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: articleText }),
+          signal: AbortSignal.timeout(15000)
+        });
+        if (!r.ok) throw new Error("API error");
+        const d = await r.json();
+        currentResult = d;
+        renderResult(d);
+        updateHighlight(articleText, d.label);
+        setAPIStatus(true);
+        if (!silent) autoExplain(d);
+      } catch (e) {
+        setAPIStatus(false);
+        if (!silent) addMsg("ai", "⚠️ Không kết nối được API.\n\nHãy chạy: `uvicorn api:app --reload --port 8000`");
+      } finally {
+        btn.disabled = false; btn.textContent = "Phân loại";
+      }
+    }
+
+    function renderResult(d) {
+      document.getElementById("resultPanel").classList.add("show");
+      const badge = document.getElementById("catBadge");
+      badge.className = "cat-badge " + d.label;
+      badge.textContent = LABEL_EMOJI[d.label] + "  " + d.label_vi;
+      const tier = document.getElementById("tierBadge");
+      tier.className = "tier-badge tier-" + d.confidence_tier;
+      tier.textContent = { HIGH: "Rất chắc", MED: "Khá chắc", LOW: "Không chắc" }[d.confidence_tier] || "";
+      document.getElementById("statsRow").innerHTML = `
+        <div class="stat-item"><span class="stat-label">Số từ</span><span class="stat-val">${(d.word_count || 0).toLocaleString("vi")}</span></div>
+        <div class="stat-item"><span class="stat-label">Đọc khoảng</span><span class="stat-val">${d.read_time || 1} phút</span></div>
+        <div class="stat-item"><span class="stat-label">Tin cậy</span><span class="stat-val">${(d.confidence * 100).toFixed(1)}%</span></div>`;
+      document.getElementById("confPct").textContent = (d.confidence * 100).toFixed(1) + "%";
+      setTimeout(() => { document.getElementById("confFill").style.width = (d.confidence * 100).toFixed(1) + "%"; }, 50);
+      const sorted = Object.entries(d.all_probs).sort((a, b) => b[1] - a[1]);
+      document.getElementById("probBars").innerHTML = sorted.map(([lbl, pct]) => `
+        <div class="prob-bar-row">
+          <span class="prob-bar-label">${LABEL_EMOJI[lbl]} ${LABEL_VI[lbl]}</span>
+          <div class="prob-bar-track"><div class="prob-bar-fill ${lbl}" data-t="${pct}" style="width:0%"></div></div>
+          <span class="prob-bar-pct">${pct.toFixed(1)}%</span>
+        </div>`).join("");
+      setTimeout(() => { document.querySelectorAll(".prob-bar-fill").forEach(el => el.style.width = el.dataset.t + "%"); }, 80);
+      document.getElementById("quickActions").innerHTML = `
+        <span class="action-chip" onclick="quickAsk('Hãy tóm tắt bài báo này trong 3-4 câu ngắn gọn.')">📝 Tóm tắt</span>
+        <span class="action-chip" onclick="quickAsk('Liệt kê 5 từ khóa quan trọng nhất của bài báo.')">🏷️ Từ khóa</span>
+        <span class="action-chip" onclick="quickAsk('Tại sao bài báo được phân loại là ${d.label_vi}? Giải thích cụ thể.')">🤔 Giải thích</span>
+        <span class="action-chip" onclick="quickAsk('Bài báo này có quan điểm thiên vị không? Phân tích.')">⚖️ Phân tích</span>`;
+      const chips = CATEGORY_CHIPS[d.label] || [];
+      const dc = document.getElementById("defaultChips");
+      if (dc) dc.innerHTML = chips.map(c => `<span class="chip" onclick="useChip(this)">${c}</span>`).join("");
+    }
+
+    function openBatch() {
+      document.getElementById("batchModal").style.display = "flex";
+      document.getElementById("batchResults").innerHTML = "";
+      document.getElementById("exportBtn").style.display = "none";
+      batchData = [];
+    }
+
+    async function runBatch() {
+      const raw = document.getElementById("batchInput").value.trim();
+      if (!raw) return;
+      const articles = raw.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+      if (!articles.length) return;
+      document.getElementById("batchResults").innerHTML = `<p style="color:var(--text-sub);font-size:12px;margin-top:8px">Đang phân loại ${articles.length} bài...</p>`;
+      try {
+        const r = await fetch(API_URL + "/classify_batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(articles.map(text => ({ text }))),
+          signal: AbortSignal.timeout(60000)
+        });
+        if (!r.ok) throw new Error("API error " + r.status);
+        batchData = await r.json();
+        document.getElementById("batchResults").innerHTML = `
+          <table class="batch-table">
+            <thead><tr><th>#</th><th>Danh mục</th><th>Tin cậy</th><th>Tier</th><th>Từ</th><th>Nội dung</th></tr></thead>
+            <tbody>${batchData.map(row => row.error
+          ? `<tr><td>${row.index + 1}</td><td colspan="5" style="color:#b91c1c">${row.error}</td></tr>`
+          : `<tr>
+                  <td>${row.index + 1}</td>
+                  <td><span class="cat-badge ${row.label}" style="padding:3px 8px;font-size:11px">${LABEL_EMOJI[row.label]} ${row.label_vi}</span></td>
+                  <td style="font-family:var(--mono)">${(row.confidence * 100).toFixed(1)}%</td>
+                  <td><span class="tier-badge tier-${row.confidence_tier}" style="font-size:10px">${row.confidence_tier}</span></td>
+                  <td style="font-family:var(--mono)">${row.word_count}</td>
+                  <td class="batch-preview">${escHtml(row.preview)}</td>
+                </tr>`).join("")}
+            </tbody>
+          </table>`;
+        document.getElementById("exportBtn").style.display = "block";
+      } catch (e) {
+        document.getElementById("batchResults").innerHTML = `<p style="color:#b91c1c;font-size:12px;margin-top:8px">Lỗi: ${e.message}</p>`;
+      }
+    }
+
+    function exportCSV() {
+      if (!batchData.length) return;
+      const header = ["STT", "Danh mục", "Nhãn", "Độ tin cậy (%)", "Tier", "Số từ", "Nội dung (80 ký tự đầu)"];
+      const rows = batchData.map(r => r.error
+        ? [r.index + 1, "LỖI", "", "", "", "", ""]
+        : [r.index + 1, r.label_vi, r.label, (r.confidence * 100).toFixed(2), r.confidence_tier, r.word_count, '"' + r.preview.replace(/"/g, '""') + '"']);
+      const csv = [header, ...rows].map(r => r.join(",")).join("\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "phobert_batch_" + Date.now() + ".csv";
+      a.click();
+    }
+
+    function clearAll() {
+      document.getElementById("articleText").value = "";
+      articleText = "";
+      document.getElementById("charCount").textContent = "0 ký tự";
+      document.getElementById("wordCount").textContent = "0 từ";
+      document.getElementById("resultPanel").classList.remove("show");
+      document.getElementById("highlight-layer").innerHTML = "";
+      document.getElementById("hlLegend").style.display = "none";
+      currentResult = null;
+      clearChat();
+    }
+
+    function clearChat() {
+      chatHistory = [];
+      document.getElementById("chatMsgs").innerHTML = `
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">💬</div>
+          <div class="empty-title">Trò chuyện với AI</div>
+          <div class="empty-sub">Phân loại bài báo để bắt đầu, hoặc hỏi ngay bất cứ điều gì.</div>
+          <div class="chips" id="defaultChips">
+            <span class="chip" onclick="useChip(this)">Tóm tắt bài báo</span>
+            <span class="chip" onclick="useChip(this)">Tại sao phân loại vậy?</span>
+            <span class="chip" onclick="useChip(this)">Từ khóa chính là gì?</span>
+            <span class="chip" onclick="useChip(this)">Mô hình có chắc không?</span>
+            <span class="chip" onclick="useChip(this)">Bài viết có thiên vị không?</span>
+          </div>
+        </div>`;
+    }
+
+    function timeNow() { return new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }); }
+
+    function renderMarkdown(text) {
+      return text
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/^[-•]\s+(.+)$/gm, "<li>$1</li>")
+        .replace(/\n/g, "<br>");
+    }
+
+    function addMsg(role, content) {
+      const c = document.getElementById("chatMsgs");
+      document.getElementById("emptyState")?.remove();
+      const div = document.createElement("div");
+      div.className = "msg " + (role === "user" ? "user" : "ai");
+      div.innerHTML = `<div class="msg-meta"><div class="msg-avatar">${role === "user" ? "👤" : "🤖"}</div><span>${role === "user" ? "Bạn" : "AI"} · ${timeNow()}</span></div><div class="bubble">${renderMarkdown(content)}</div>`;
+      c.appendChild(div); c.scrollTop = c.scrollHeight;
+    }
+
+    async function addStreamMsg(content) {
+      const c = document.getElementById("chatMsgs");
+      document.getElementById("emptyState")?.remove();
+      const div = document.createElement("div");
+      div.className = "msg ai";
+      div.innerHTML = `<div class="msg-meta"><div class="msg-avatar">🤖</div><span>AI · ${timeNow()}</span></div><div class="bubble" id="sBubble"></div>`;
+      c.appendChild(div); c.scrollTop = c.scrollHeight;
+      const bubble = div.querySelector("#sBubble");
+      let i = 0;
+      await new Promise(resolve => {
+        function tick() {
+          if (i < content.length) {
+            i += Math.ceil(content.length / 180);
+            bubble.innerHTML = renderMarkdown(content.slice(0, Math.min(i, content.length)));
+            c.scrollTop = c.scrollHeight;
+            setTimeout(tick, 16);
+          } else {
+            bubble.innerHTML = renderMarkdown(content);
+            bubble.removeAttribute("id");
+            resolve();
+          }
+        }
+        tick();
+      });
+    }
+
+    function showTyping() {
+      const c = document.getElementById("chatMsgs");
+      document.getElementById("emptyState")?.remove();
+      const div = document.createElement("div");
+      div.className = "msg ai"; div.id = "typingEl";
+      div.innerHTML = `<div class="msg-meta"><div class="msg-avatar">🤖</div><span>AI đang soạn...</span></div><div class="typing-bubble"><span></span><span></span><span></span></div>`;
+      c.appendChild(div); c.scrollTop = c.scrollHeight;
+    }
+    function removeTyping() { document.getElementById("typingEl")?.remove(); }
+
+    function buildSystemPrompt() {
+      let p = `Bạn là NewsMind - trợ lý AI thân thiện, chuyên phân tích tin tức tiếng Việt. Tên của bạn là NewsMind. Trả lời ngắn gọn, súc tích bằng tiếng Việt. Dùng bullet point khi cần. Không thêm lời chào thừa.`;
+      if (currentResult) {
+        p += `\n\nNgữ cảnh bài báo:\n- Phân loại: ${currentResult.label_vi} (${currentResult.label})\n- Độ tin cậy: ${(currentResult.confidence * 100).toFixed(1)}% (${currentResult.confidence_tier})\n- Xác suất: ${JSON.stringify(currentResult.all_probs)}\n- Số từ: ${currentResult.word_count} | Đọc: ${currentResult.read_time} phút\n- Câu đầu: "${currentResult.top_sentences}"\n- Nội dung (700 ký tự): "${articleText.slice(0, 700)}"`;
+      }
+      return p;
+    }
+
+    // ── Gọi LLM qua backend (tránh CORS, ẩn API key) ──
+    async function callLLM(userMsg) {
+      const r = await fetch(API_URL + "/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system: buildSystemPrompt(),
+          messages: [...chatHistory, { role: "user", content: userMsg }]
+        }),
+        signal: AbortSignal.timeout(35000)
+      });
+      if (!r.ok) throw new Error("Lỗi kết nối backend /chat");
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      return d.reply;
+    }
+
+    async function sendMsg() {
+      if (isSending) return;
+      const input = document.getElementById("chatInput");
+      const txt = input.value.trim();
+      if (!txt) return;
+      isSending = true; document.getElementById("sendBtn").disabled = true;
+      input.value = ""; autoResize(input);
+      addMsg("user", txt); showTyping();
+      try {
+        const reply = await callLLM(txt);
+        removeTyping(); await addStreamMsg(reply);
+        chatHistory.push({ role: "user", content: txt }, { role: "assistant", content: reply });
+        if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+      } catch (e) {
+        removeTyping(); addMsg("ai", "⚠️ **Lỗi:** " + e.message);
+      } finally {
+        isSending = false; document.getElementById("sendBtn").disabled = false; input.focus();
+      }
+    }
+
+    async function autoExplain(d) {
+      showTyping();
+      const prompt = `Bài báo vừa được phân loại là **${d.label_vi}** với độ tin cậy **${(d.confidence * 100).toFixed(1)}%**. Hãy giải thích ngắn gọn 3-4 câu tại sao dựa vào nội dung.`;
+      try {
+        const reply = await callLLM(prompt);
+        removeTyping(); await addStreamMsg(reply);
+        chatHistory.push({ role: "user", content: prompt }, { role: "assistant", content: reply });
+      } catch (e) {
+        removeTyping(); addMsg("ai", `✅ Phân loại xong! Bài báo thuộc **${d.label_vi}** (${(d.confidence * 100).toFixed(1)}%). Hỏi tôi bất cứ điều gì nhé.`);
+      }
+    }
+
+    function quickAsk(text) { const input = document.getElementById("chatInput"); input.value = text; autoResize(input); sendMsg(); }
+    function useChip(el) { const input = document.getElementById("chatInput"); input.value = el.textContent; autoResize(input); input.focus(); }
+    function handleChatKey(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+    function autoResize(el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, 100) + "px"; }
+  </script>
+</body>
+
+</html>

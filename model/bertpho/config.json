@@ -1,0 +1,17 @@
+{
+    "model_name": "phobert-base",
+    "num_classes": 4,
+    "hyperparameters": {
+        "optimizer": "AdamW",
+        "learning_rate": 2e-05,
+        "batch_size": 8,
+        "max_seq_length": 512,
+        "dropout": 0.1,
+        "weight_decay": 0.01,
+        "num_epochs": 3,
+        "warmup_ratio": 0.06,
+        "fp16": true
+    },
+    "total_params": 135197956,
+    "trainable_params": 135197956
+}
