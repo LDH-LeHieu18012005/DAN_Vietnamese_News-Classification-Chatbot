@@ -1,5 +1,8 @@
 # 📰 NewsMind — Vietnamese News Classifier
 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Hieu18012005/NewsMind)
+[![Model Weights](https://img.shields.io/badge/%F0%9F%A4%97%20Models-PhoBERT-yellow)](https://huggingface.co/Hieu18012005/newsmind-phobert)
+
 **NewsMind** là hệ thống phân loại bài báo tiếng Việt end-to-end, kết hợp mô hình học sâu **PhoBERT** (fine-tuned) với trợ lý AI **Llama-3.1-8B** để phân loại và giải thích nội dung tin tức theo thời gian thực.
 
 > **Nguồn dữ liệu:** Báo Lao Động (laodong.vn) | **4 chủ đề:** Công nghệ · Kinh doanh · Thế giới · Thể thao
@@ -275,9 +278,17 @@ Proxy gọi LLM (Llama-3.1-8B) qua HuggingFace Router, ẩn API key ở backend.
 
 ---
 
-## 🚀 Cài đặt & Chạy
+## 🚀 Trải nghiệm & Cài đặt
 
-### Yêu cầu hệ thống
+### 🌐 Dùng thử Online (Live Demo)
+Dự án đã được deploy trên **Hugging Face Spaces** để mọi người có thể trải nghiệm ngay lập tức mà không cần cài đặt.
+👉 **[Truy cập NewsMind Live Demo](https://huggingface.co/spaces/Hieu18012005/NewsMind)**
+
+---
+
+### 💻 Cài đặt & Chạy Local
+
+#### Yêu cầu hệ thống
 - Python 3.8+
 - CUDA (tùy chọn — tự động dùng CPU nếu không có GPU)
 - RAM ≥ 4 GB (8 GB khuyến nghị)

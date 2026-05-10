@@ -6,6 +6,7 @@ import httpx
 from transformers import AutoTokenizer, AutoModel
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from huggingface_hub import hf_hub_download
 
 load_dotenv()
 HF_API_KEY = os.getenv("HF_API_KEY", "")
@@ -18,12 +19,31 @@ from pydantic import BaseModel
 # =========================
 # CONFIG
 # =========================
-MODEL_PATH = r"C:/Users/DELL/Desktop/The News/model/bertpho/model.pt"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOCAL_MODEL_PATH = os.path.join(BASE_DIR, "model", "bertpho", "model.pt")
+HF_MODEL_REPO = "Hieu18012005/newsmind-phobert"  # Model weights trên HF Hub
 BASE_MODEL = "vinai/phobert-base"
 MAX_LEN = 512
 HF_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
 HF_MODEL_ROUTED = "meta-llama/Llama-3.1-8B-Instruct:cerebras"
 HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
+
+
+def get_model_path():
+    """Tìm model.pt: local trước, nếu không có thì download từ HF Hub."""
+    if os.path.exists(LOCAL_MODEL_PATH):
+        print(f"📂 Dùng model local: {LOCAL_MODEL_PATH}")
+        return LOCAL_MODEL_PATH
+    # Auto-download từ HuggingFace Hub
+    print(f"⬇️  Đang download model từ HF Hub: {HF_MODEL_REPO}...")
+    cache_dir = os.environ.get("HF_HOME", "/tmp/hf_cache")
+    path = hf_hub_download(
+        repo_id=HF_MODEL_REPO,
+        filename="model.pt",
+        cache_dir=cache_dir,
+    )
+    print(f"✅ Model đã download: {path}")
+    return path
 
 label_map = {0: "cong-nghe", 1: "kinh-doanh", 2: "the-gioi", 3: "the-thao"}
 label_map_vi = {
@@ -83,9 +103,10 @@ class PhoBERTClassifier(nn.Module):
 # LOAD MODEL (1 lần khi khởi động)
 # =========================
 print("Đang load model PhoBERT...")
+MODEL_PATH = get_model_path()
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, use_fast=False)
 model = PhoBERTClassifier(BASE_MODEL, 4)
-state_dict = torch.load(MODEL_PATH, map_location=device)
+state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
 model.load_state_dict(state_dict)
 model.to(device)
 model.eval()
